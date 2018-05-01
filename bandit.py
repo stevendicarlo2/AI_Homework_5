@@ -31,6 +31,10 @@ def get_move(state):
             move = get_phase_2a_move(info)
         except:
             move = []
+
+        info["chosen_slots"] = move
+        save_data(info)
+
         return {
             "team-code": team_code,
             "game": game,
@@ -38,9 +42,9 @@ def get_move(state):
         }
     elif game == "phase_2_b":
         try:
-            move = get_phase_2b_move()
+            move = get_phase_2b_move(state, info)
         except:
-            move = 1
+            move = 0
         return {
             "team-code": team_code,
             "game": game,
@@ -107,8 +111,19 @@ def get_phase_2a_move(info):
     return return_list
 
 
-def get_phase_2b_move():
-    return 1
+def get_phase_2b_move(state, info):
+    auction_number = state["auction-number"]
+    chosen_slots = info["chosen_slots"]
+    remaining_credits = info["remaining_credits"]
+    won_slots = state["your-slots"]
+
+    if len(won_slots) > 4:
+        return 0
+
+    if auction_number in chosen_slots:
+        return remaining_credits//10
+    else:
+        return 0
 
 
 def load_data():
@@ -121,6 +136,7 @@ def load_data():
             [1],
             [2]
         ],
+        "chosen_slots": [1, 2],
         "remaining_credits": 103893,
         "last_pull": 0
     }
@@ -132,7 +148,12 @@ def save_data(info):
 
 sample_state = {
    "team-code": "eef8976e",
-   "game": "phase_2_a",
+   "game": "phase_2_b",
+   "auction-number": 2,
+   "your-slots": [],
+   "auction-lists": [
+     ["eef8976e"]
+    ]
 }
 
 
